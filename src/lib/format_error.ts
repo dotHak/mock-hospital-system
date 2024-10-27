@@ -1,15 +1,15 @@
 import { ZodError } from "zod";
 
-export const formatZodError = (error: ZodError) => {
-    return error.errors.map((err) => ({
+export function formatZodError(error: ZodError) {
+    return error.errors.map(err => ({
         path: err.path.join("."), // Join path array into a string (e.g., 'id')
         message: err.message, // Error message
         code: err.code, // Zod error code
     }));
-};
+}
 
-export const invalidRequest = (c: any, result: any) => {
-    if (result.error instanceof ZodError)
+export function invalidRequest(c: any, result: any) {
+    if (result.error instanceof ZodError) {
         return c.json(
             {
                 message: "Invalid request",
@@ -18,5 +18,6 @@ export const invalidRequest = (c: any, result: any) => {
             },
             400,
         );
+    }
     return c.json({ message: "Invalid request", code: 400 }, 400);
-};
+}

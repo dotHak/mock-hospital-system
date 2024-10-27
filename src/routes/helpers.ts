@@ -20,7 +20,7 @@ export const MessageSchema = z.object({
     }),
 });
 
-export const filterUndedinedfields = <T>(obj: T): T => {
+export function filterUndedinedfields<T>(obj: T): T {
     const newObj = {} as T;
     for (const key in obj) {
         if (obj[key] !== undefined) {
@@ -28,4 +28,4 @@ export const filterUndedinedfields = <T>(obj: T): T => {
         }
     }
     return newObj;
-};
+}

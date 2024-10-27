@@ -1,15 +1,15 @@
 import "dotenv/config";
+import { drizzle } from "drizzle-orm/libsql";
+
 import allDoctors from "./doctors.json";
 import allServices from "./services.json";
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/libsql";
-import { doctors, services, serviceDoctors } from "./src/db/schema.js";
+import { doctors, serviceDoctors, services } from "./src/db/schema.js";
 
 function doctorNameMatch(doctorOneName: string, doctorTwoName: string) {
-    const doctorOne = doctorOneName.split(" ").map((name) => name.trim());
-    const doctorTwo = doctorTwoName.split(" ").map((name) => name.trim());
+    const doctorOne = doctorOneName.split(" ").map(name => name.trim());
+    const doctorTwo = doctorTwoName.split(" ").map(name => name.trim());
 
-    return doctorOne.every((name) => doctorTwo.includes(name));
+    return doctorOne.every(name => doctorTwo.includes(name));
 }
 
 async function seed() {
@@ -34,7 +34,7 @@ async function seed() {
 
     const serviceDoctorValues = allServices.flatMap((service, index) => {
         return service.doctors.map((doctor) => {
-            const doc = returnedDoctors.find((d) => doctorNameMatch(d.name, doctor.name));
+            const doc = returnedDoctors.find(d => doctorNameMatch(d.name, doctor.name));
 
             if (doc) {
                 return {
@@ -45,7 +45,7 @@ async function seed() {
         });
     });
 
-    const serviceDoctorValuesNo = serviceDoctorValues.filter((value) => !!value);
+    const serviceDoctorValuesNo = serviceDoctorValues.filter(value => !!value);
 
     await db.insert(serviceDoctors).values(serviceDoctorValuesNo);
     console.log("=== Inserted service doctors ===");

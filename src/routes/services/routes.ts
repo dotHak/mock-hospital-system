@@ -1,11 +1,12 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { z as zz } from "zod";
-import * as HttpStatusCodes from "@/http-status-codes";
-import jsonContent from "@/utils/json-content";
+
 import { InsertServiceSchema, SelectServiceSchema } from "@/db/schema";
-import { GetOneIdParam, MessageSchema } from "../helpers";
+import * as HttpStatusCodes from "@/http-status-codes";
 import { ErrorSchema } from "@/types";
-import doctors from "../doctors";
+import jsonContent from "@/utils/json-content";
+
+import { GetOneIdParam, MessageSchema } from "../helpers";
 
 const tags = ["Services"];
 

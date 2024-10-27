@@ -1,6 +1,7 @@
 import createApp from "@/lib/create-app";
-import { CreateRoute, ListRoute, GetOneRoute, UpdateRoute, DeleteRoute } from "./routes";
-import { create, list, getOne, update, remove } from "./handlers";
+
+import { create, getOne, list, remove, update } from "./handlers";
+import { CreateRoute, DeleteRoute, GetOneRoute, ListRoute, UpdateRoute } from "./routes";
 
 export default createApp()
     .openapi(ListRoute, list)

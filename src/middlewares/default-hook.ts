@@ -10,7 +10,7 @@ const defaultHook: Hook<any, any, any, any> = (result, c) => {
             {
                 success: result.success,
                 error: formatZodError(result.error),
-                message: UNPROCESSABLE_ENTITY_PHRASE + ": One or more fields are invalid",
+                message: `${UNPROCESSABLE_ENTITY_PHRASE}: One or more fields are invalid`,
                 code: UNPROCESSABLE_ENTITY,
             },
             UNPROCESSABLE_ENTITY,

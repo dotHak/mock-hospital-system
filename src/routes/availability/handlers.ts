@@ -1,9 +1,11 @@
-import { AppRouteHandler } from "@/types";
-import type { ListRouteType } from "./routes";
-import { db } from "@/db/db";
-import { unavailability, appointments } from "@/db/schema";
-import * as HttpStatusCodes from "@/http-status-codes";
 import { sql } from "drizzle-orm";
+
+import type { AppRouteHandler } from "@/types";
+
+import { db } from "@/db/db";
+import * as HttpStatusCodes from "@/http-status-codes";
+
+import type { ListRouteType } from "./routes";
 
 export const list: AppRouteHandler<ListRouteType> = async (c) => {
     const { id } = c.req.valid("param");
@@ -72,13 +74,13 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
         }),
     ]);
 
-    let unavailabilites = apps.map((app) => ({
+    let unavailabilites = apps.map(app => ({
         startDateTime: `${app.appointmentDate}T${app.startTime}`,
         endDateTime: `${app.appointmentDate}T${app.endTime}`,
         isAvailable: false,
     }));
 
-    const unavResults = unavs.map((unav) => ({
+    const unavResults = unavs.map(unav => ({
         startDateTime: `${unav.startDate}T${unav.startTime}`,
         endDateTime: `${unav.endDate}T${unav.endTime}`,
         isAvailable: false,

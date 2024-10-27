@@ -1,16 +1,20 @@
-import { db } from "@/db/db";
-import * as HttpStatusCodes from "@/http-status-codes";
-import { services, serviceDoctors, doctors } from "@/db/schema";
-import { AppRouteHandler } from "@/types";
-import type {
-    ListRouteType,
-    GetOneRouteType,
-    CreateRouteType,
-    UpdateRouteType,
-    DeleteRouteType,
-} from "./routes";
-import { filterUndedinedfields } from "../helpers";
 import { eq } from "drizzle-orm";
+
+import type { AppRouteHandler } from "@/types";
+
+import { db } from "@/db/db";
+import { serviceDoctors, services } from "@/db/schema";
+import * as HttpStatusCodes from "@/http-status-codes";
+
+import type {
+    CreateRouteType,
+    DeleteRouteType,
+    GetOneRouteType,
+    ListRouteType,
+    UpdateRouteType,
+} from "./routes";
+
+import { filterUndedinedfields } from "../helpers";
 
 export const list: AppRouteHandler<ListRouteType> = async (c) => {
     const results = await db.query.services.findMany();
@@ -18,7 +22,7 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
     return c.json(results, HttpStatusCodes.OK);
 };
 
-const getOneService = (id: number) => {
+function getOneService(id: number) {
     return db.query.services.findFirst({
         where: (s, { eq }) => eq(s.id, id),
         with: {
@@ -34,7 +38,7 @@ const getOneService = (id: number) => {
             },
         },
     });
-};
+}
 export const getOne: AppRouteHandler<GetOneRouteType> = async (c) => {
     const { id } = c.req.valid("param");
     const result = await db.query.services.findFirst({
@@ -80,11 +84,11 @@ export const create: AppRouteHandler<CreateRouteType> = async (c) => {
         });
 
         if (doctors.length !== doctorIds.length) {
-            const invalidDoctorIds = doctorIds.filter((id) => !doctors.some((d) => d.id === id));
+            const invalidDoctorIds = doctorIds.filter(id => !doctors.some(d => d.id === id));
             const invalidDoctorIdsStr = invalidDoctorIds.join(", ");
             return c.json(
                 {
-                    message: "Invalid doctorIds: " + invalidDoctorIdsStr,
+                    message: `Invalid doctorIds: ${invalidDoctorIdsStr}`,
                     success: false,
                     code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
                 },
@@ -101,7 +105,7 @@ export const create: AppRouteHandler<CreateRouteType> = async (c) => {
         })
         .returning();
 
-    const serviceDoctorValues = doctorIds!.map((doctorId) => ({
+    const serviceDoctorValues = doctorIds!.map(doctorId => ({
         serviceId: service.id,
         doctorId,
     }));
@@ -158,7 +162,7 @@ export const update: AppRouteHandler<UpdateRouteType> = async (c) => {
     if (!service) {
         return c.json(
             {
-                message: "Service not found for id " + id,
+                message: `Service not found for id ${id}`,
                 success: false,
                 code: HttpStatusCodes.NOT_FOUND,
             },
@@ -176,11 +180,11 @@ export const update: AppRouteHandler<UpdateRouteType> = async (c) => {
         });
 
         if (doctors.length !== doctorIds.length) {
-            const invalidDoctorIds = doctorIds.filter((id) => !doctors.some((d) => d.id === id));
+            const invalidDoctorIds = doctorIds.filter(id => !doctors.some(d => d.id === id));
             const invalidDoctorIdsStr = invalidDoctorIds.join(", ");
             return c.json(
                 {
-                    message: "Invalid doctorIds: " + invalidDoctorIdsStr,
+                    message: `Invalid doctorIds: ${invalidDoctorIdsStr}`,
                     success: false,
                     code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
                 },
@@ -191,7 +195,7 @@ export const update: AppRouteHandler<UpdateRouteType> = async (c) => {
 
     delete values.doctorIds;
 
-    let resultFinal = undefined;
+    let resultFinal;
 
     if (Object.keys(values).length > 0 && !doctorIds) {
         c.var.logger.info("Values");
@@ -201,9 +205,10 @@ export const update: AppRouteHandler<UpdateRouteType> = async (c) => {
         ]);
 
         resultFinal = results;
-    } else if (Object.keys(values).length > 0 && doctorIds) {
+    }
+    else if (Object.keys(values).length > 0 && doctorIds) {
         c.var.logger.info("Values and doctorIds");
-        const serviceDoctorValues = doctorIds!.map((doctorId) => ({
+        const serviceDoctorValues = doctorIds!.map(doctorId => ({
             serviceId: id,
             doctorId,
         }));
@@ -216,9 +221,10 @@ export const update: AppRouteHandler<UpdateRouteType> = async (c) => {
         ]);
 
         resultFinal = result;
-    } else if (Object.keys(values).length === 0 && doctorIds) {
+    }
+    else if (Object.keys(values).length === 0 && doctorIds) {
         c.var.logger.info("doctorIds");
-        const serviceDoctorValues = doctorIds!.map((doctorId) => ({
+        const serviceDoctorValues = doctorIds!.map(doctorId => ({
             serviceId: id,
             doctorId,
         }));
@@ -245,7 +251,7 @@ export const remove: AppRouteHandler<DeleteRouteType> = async (c) => {
     if (!service) {
         return c.json(
             {
-                message: "Service not found for id " + id,
+                message: `Service not found for id ${id}`,
                 success: false,
                 code: HttpStatusCodes.NOT_FOUND,
             },

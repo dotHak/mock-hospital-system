@@ -1,15 +1,16 @@
-import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { apiReference } from "@scalar/hono-api-reference";
+
+import type { AppBindings } from "@/types/app";
+
+import { notFound, onError, pinoLogger, serveEmojiFavicon } from "@/middlewares";
 import {
-    doctorsApi,
     appointmentsApi,
+    availabilityApi,
+    doctorsApi,
     servicesApi,
     unavailabilityApi,
-    availabilityApi,
 } from "@/routes";
-import { AppBindings } from "@/types/app";
-import { pinoLogger, serveEmojiFavicon, notFound, onError } from "@/middlewares";
-import { apiReference } from "@scalar/hono-api-reference";
-import defaultHook from "./middlewares/default-hook";
 
 const app = new OpenAPIHono<AppBindings>().basePath("/api");
 app.use(pinoLogger());

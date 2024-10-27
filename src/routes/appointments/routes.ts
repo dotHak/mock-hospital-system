@@ -1,9 +1,10 @@
-import { SelectAppointmentSchema, InsertAppointmentSchema } from "@/db/schema";
 import { createRoute, z } from "@hono/zod-openapi";
-import { ZodError } from "zod";
-import { ErrorSchema } from "@/types/routes";
+
+import { InsertAppointmentSchema, SelectAppointmentSchema } from "@/db/schema";
 import * as HttpStatusCodes from "@/http-status-codes";
+import { ErrorSchema } from "@/types/routes";
 import jsonContent from "@/utils/json-content";
+
 import { GetOneIdParam } from "../helpers";
 
 const tags = ["Appointments"];

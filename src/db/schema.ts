@@ -1,7 +1,6 @@
-import { sql, relations } from "drizzle-orm";
-import { text, sqliteTable, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { relations, sql } from "drizzle-orm";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { startTime } from "hono/timing";
 import { z } from "zod";
 
 export const doctors = sqliteTable("doctors", {
@@ -16,10 +15,10 @@ export const doctors = sqliteTable("doctors", {
 });
 
 export const InsertDoctorSchema = createInsertSchema(doctors, {
-    name: (z) => z.name.min(1),
-    title: (z) => z.title.min(1),
-    link: (z) => z.link.url(),
-    email: (z) => z.email.email(),
+    name: z => z.name.min(1),
+    title: z => z.title.min(1),
+    link: z => z.link.url(),
+    email: z => z.email.email(),
 }).omit({
     createdAt: true,
     id: true,
@@ -40,8 +39,8 @@ export const services = sqliteTable("services", {
 });
 
 export const InsertServiceSchema = createInsertSchema(services, {
-    title: (z) => z.title.min(1),
-    context: (z) => z.context.min(1),
+    title: z => z.title.min(1),
+    context: z => z.context.min(1),
 }).omit({
     id: true,
     createdAt: true,
@@ -94,12 +93,12 @@ export const appointments = sqliteTable("appointments", {
 });
 
 export const InsertAppointmentSchema = createInsertSchema(appointments, {
-    patientName: (z) => z.patientName.min(1),
-    email: (z) => z.email.email(),
-    reason: (z) => z.reason.min(1),
-    appointmentDate: (z) => z.appointmentDate.date(),
-    startTime: (z) => z.startTime.time(),
-    endTime: (z) => z.endTime.time(),
+    patientName: z => z.patientName.min(1),
+    email: z => z.email.email(),
+    reason: z => z.reason.min(1),
+    appointmentDate: z => z.appointmentDate.date(),
+    startTime: z => z.startTime.time(),
+    endTime: z => z.endTime.time(),
     status: z.enum(["booked", "cancelled", "completed", "rescheduled"]),
 }).omit({
     createdAt: true,
@@ -130,12 +129,12 @@ export const unavailability = sqliteTable("unavailability", {
 });
 
 export const InsertUnavailabilitySchema = createInsertSchema(unavailability, {
-    startDate: (z) => z.startDate.date(),
-    endDate: (z) => z.endDate.date(),
-    startTime: (z) => z.startTime.time().optional(),
-    endTime: (z) => z.endTime.time().optional(),
+    startDate: z => z.startDate.date(),
+    endDate: z => z.endDate.date(),
+    startTime: z => z.startTime.time().optional(),
+    endTime: z => z.endTime.time().optional(),
     frequency: z.enum(["once", "daily", "weekly", "monthly"]),
-    reason: (z) => z.reason.min(1),
+    reason: z => z.reason.min(1),
 }).omit({
     id: true,
     createdAt: true,

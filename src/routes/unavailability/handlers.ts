@@ -1,16 +1,20 @@
-import { AppRouteHandler } from "@/types";
-import type {
-    ListRouteType,
-    CreateRouteType,
-    GetOneRouteType,
-    UpdateRouteType,
-    DeleteRouteType,
-} from "./routes";
+import { eq } from "drizzle-orm";
+
+import type { AppRouteHandler } from "@/types";
+
 import { db } from "@/db/db";
 import { unavailability } from "@/db/schema";
 import * as HttpStatusCodes from "@/http-status-codes";
+
+import type {
+    CreateRouteType,
+    DeleteRouteType,
+    GetOneRouteType,
+    ListRouteType,
+    UpdateRouteType,
+} from "./routes";
+
 import { filterUndedinedfields } from "../helpers";
-import { eq } from "drizzle-orm";
 
 export const list: AppRouteHandler<ListRouteType> = async (c) => {
     const unavailabilities = await db.query.unavailability.findMany();
@@ -44,7 +48,7 @@ export const getOne: AppRouteHandler<GetOneRouteType> = async (c) => {
 export const create: AppRouteHandler<CreateRouteType> = async (c) => {
     const values = c.req.valid("json");
 
-    //check if the date in the future
+    // check if the date in the future
     values.startTime = values.startTime || "00:00:00";
     const startDate = new Date(`${values.startDate}T${values.startTime}`);
     values.endTime = values.endTime || "23:59:59";
@@ -84,7 +88,7 @@ export const create: AppRouteHandler<CreateRouteType> = async (c) => {
         return c.json(
             {
                 success: false,
-                message: "Doctor not found for id: " + values.doctorId,
+                message: `Doctor not found for id: ${values.doctorId}`,
                 code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
             },
             HttpStatusCodes.UNPROCESSABLE_ENTITY,
@@ -125,7 +129,7 @@ export const update: AppRouteHandler<UpdateRouteType> = async (c) => {
             return c.json(
                 {
                     success: false,
-                    message: "Doctor not found for id: " + values.doctorId,
+                    message: `Doctor not found for id: ${values.doctorId}`,
                     code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
                 },
                 HttpStatusCodes.UNPROCESSABLE_ENTITY,

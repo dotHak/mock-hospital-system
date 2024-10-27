@@ -1,8 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { GetOneIdParam } from "../helpers";
+
 import * as HttpStatusCodes from "@/http-status-codes";
-import jsonContent from "@/utils/json-content";
 import { ErrorSchema } from "@/types";
+import jsonContent from "@/utils/json-content";
+
+import { GetOneIdParam } from "../helpers";
 
 const tags = ["Availability"];
 

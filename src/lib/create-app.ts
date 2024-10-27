@@ -1,13 +1,14 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 
-import { AppBindings } from "@/types/app";
+import type { AppBindings } from "@/types/app";
+
 import defaultHook from "@/middlewares/default-hook";
 
-export const createApp = () => {
+export function createApp() {
     return new OpenAPIHono<AppBindings>({
         strict: false,
-        defaultHook: defaultHook,
+        defaultHook,
     });
-};
+}
 
 export default createApp;

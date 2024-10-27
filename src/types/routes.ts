@@ -1,5 +1,4 @@
-import { RouteConfig, RouteHandler, z } from "@hono/zod-openapi";
-import { AppBindings } from "@/types/app";
+import { z } from "@hono/zod-openapi";
 
 export const ErrorSchema = z
     .object({

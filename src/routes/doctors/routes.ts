@@ -1,9 +1,10 @@
-import { doctors, InsertDoctorSchema, SelectDoctorSchema } from "@/db/schema";
 import { createRoute, z } from "@hono/zod-openapi";
-import { ErrorSchema } from "@/types/routes";
-import { formatZodError } from "@/lib/format_error";
+
+import { InsertDoctorSchema, SelectDoctorSchema } from "@/db/schema";
 import * as HttpStatusCodes from "@/http-status-codes";
+import { ErrorSchema } from "@/types/routes";
 import jsonContent from "@/utils/json-content";
+
 import { GetOneIdParam } from "../helpers";
 
 const tags = ["doctors"];

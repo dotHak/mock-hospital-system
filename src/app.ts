@@ -3,7 +3,12 @@ import { apiReference } from "@scalar/hono-api-reference";
 
 import type { AppBindings } from "@/types/app";
 
-import { notFound, onError, pinoLogger, serveEmojiFavicon } from "@/middlewares";
+import {
+    notFound,
+    onError,
+    pinoLogger,
+    serveEmojiFavicon,
+} from "@/middlewares";
 import {
     appointmentsApi,
     availabilityApi,
@@ -34,7 +39,7 @@ app.get(
     "/reference",
     apiReference({
         theme: "kepler",
-        layout: "classic",
+        layout: "modern",
         defaultHttpClient: {
             targetKey: "python",
             clientKey: "requests",

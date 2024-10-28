@@ -28,7 +28,7 @@ export const search: AppRouteHandler<SearchRouteType> = async (c) => {
     .map((term) => term.trim())
     .filter(Boolean);
 
-  const result = await db.query.doctors.findFirst({
+  const result = await db.query.doctors.findMany({
     where: (d, { and, like }) =>
       and(
         ...terms.map((term) =>

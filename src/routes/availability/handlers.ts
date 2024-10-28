@@ -121,6 +121,15 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
         });
     }
 
+
+    if (unavailabilites.length === 0) {
+        availabilities.push({
+            startDateTime: `${startDate}T00:00:00`,
+            endDateTime: `${endDate}T23:59:59`,
+            isAvailable: true,
+        });
+    }
+
     results = results.concat(availabilities);
     results = results.sort((a, b) => {
         return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime();

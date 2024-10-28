@@ -34,7 +34,7 @@ export const SearchRoute = createRoute({
         }),
     },
     responses: {
-        [HttpStatusCodes.OK]: jsonContent(SelectDoctorSchema, "Searched doctor"),
+        [HttpStatusCodes.OK]: jsonContent(z.array(SelectDoctorSchema), "Searched doctor"),
         [HttpStatusCodes.NOT_FOUND]: jsonContent(ErrorSchema, "Doctor not found"),
         [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(ErrorSchema, "Invalid input"),
     },

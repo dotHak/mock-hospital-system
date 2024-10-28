@@ -39,7 +39,7 @@ app.get(
     "/reference",
     apiReference({
         theme: "kepler",
-        layout: "modern",
+        layout: "classic",
         defaultHttpClient: {
             targetKey: "python",
             clientKey: "requests",

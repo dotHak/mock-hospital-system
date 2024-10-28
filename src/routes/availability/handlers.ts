@@ -1,3 +1,6 @@
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter.js"
 import { sql } from "drizzle-orm";
 
 import type { AppRouteHandler } from "@/types";
@@ -6,6 +9,9 @@ import { db } from "@/db/db";
 import * as HttpStatusCodes from "@/http-status-codes";
 
 import type { ListRouteType } from "./routes";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(isSameOrAfter);
 
 export const list: AppRouteHandler<ListRouteType> = async (c) => {
     const { id } = c.req.valid("param");
@@ -53,16 +59,40 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
             },
         }),
         db.query.unavailability.findMany({
-            where: (u, { eq, and, gte, lte }) =>
+            where: (u, { eq, and, gte, lte, or }) =>
                 and(
                     eq(u.doctorId, id),
-                    gte(
-                        sql`datetime(${u.startDate} || ' ' || ${u.startTime})`,
-                        sql`datetime(${startDate})`,
-                    ),
-                    lte(
-                        sql`datetime(${u.endDate} || ' ' || ${u.endTime})`,
-                        sql`datetime(${endDate})`,
+                    or(
+                        and(
+                            gte(
+                                sql`datetime(${u.startDate} || ' ' || ${u.startTime})`,
+                                sql`datetime(${startDate})`,
+                            ),
+                            lte(
+                                sql`datetime(${u.endDate} || ' ' || ${u.endTime})`,
+                                sql`datetime(${endDate})`,
+                            ),
+                        ),
+                        and(
+                            gte(
+                                sql`datetime(${u.startDate} || ' ' || ${u.startTime})`,
+                                sql`datetime(${startDate})`,
+                            ),
+                            lte(
+                                sql`datetime(${u.startDate} || ' ' || ${u.startTime})`,
+                                sql`datetime(${endDate})`,
+                            ),
+                        ),
+                        and(
+                            gte(
+                                sql`datetime(${u.endDate} || ' ' || ${u.endTime})`,
+                                sql`datetime(${startDate})`,
+                            ),
+                            lte(
+                                sql`datetime(${u.endDate} || ' ' || ${u.endTime})`,
+                                sql`datetime(${endDate})`,
+                            )
+                        ),
                     ),
                 ),
             columns: {
@@ -75,65 +105,65 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
     ]);
 
     let unavailabilites = apps.map(app => ({
-        startDateTime: `${app.appointmentDate}T${app.startTime}`,
-        endDateTime: `${app.appointmentDate}T${app.endTime}`,
+        startDateTime: `${app.appointmentDate} ${app.startTime}`,
+        endDateTime: `${app.appointmentDate} ${app.endTime}`,
         isAvailable: false,
     }));
 
     const unavResults = unavs.map(unav => ({
-        startDateTime: `${unav.startDate}T${unav.startTime}`,
-        endDateTime: `${unav.endDate}T${unav.endTime}`,
+        startDateTime: `${unav.startDate} ${unav.startTime}`,
+        endDateTime: `${unav.endDate} ${unav.endTime}`,
         isAvailable: false,
     }));
 
     unavailabilites = unavailabilites.concat(unavResults);
 
-    let results = unavailabilites.sort((a, b) => {
+    unavailabilites = unavailabilites.sort((a, b) => {
         return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime();
     });
 
     // extrapolate the availabilities from the unavailabilities
     const availabilities = [];
-    startDate = startDate.split(" ")[0];
-    endDate = endDate.split(" ")[0];
-    let lastEnd = new Date(startDate);
+    if (unavailabilites.length === 0) {
+        availabilities.push({
+            startDateTime: startDate,
+            endDateTime: endDate,
+            isAvailable: true,
+        });
+    }
+    else {
+        const date_format = "YYYY-MM-DD HH:mm:ss";
+        let startDatejs = dayjs(startDate, date_format);
+        const endDatejs = dayjs(endDate, date_format);
 
-    for (const unavailability of results) {
-        const unavStart = new Date(unavailability.startDateTime);
-        const unavEnd = new Date(unavailability.endDateTime);
+        for (const unavailability of unavailabilites) {
+            const unavStart = dayjs(unavailability.startDateTime, date_format);
+            const unavEnd = dayjs(unavailability.endDateTime, date_format);
 
-        if (unavStart > lastEnd) {
+            if (startDatejs.isSameOrAfter(unavStart) || unavEnd.isSameOrAfter(endDatejs)) {
+                startDatejs = unavEnd;
+                continue;
+            }
+
+            if (unavStart.isBefore(endDatejs)) {
+                availabilities.push({
+                    startDateTime: startDatejs.format(date_format),
+                    endDateTime: unavailability.startDateTime,
+                    isAvailable: true,
+                });
+            }
+
+            startDatejs = unavEnd;
+        }
+
+        if (startDatejs.isBefore(endDatejs)) {
             availabilities.push({
-                startDateTime: lastEnd.toISOString(),
-                endDateTime: unavStart.toISOString(),
+                startDateTime: startDatejs.format(date_format),
+                endDateTime: endDate,
                 isAvailable: true,
             });
         }
-
-        lastEnd = unavEnd;
     }
 
-    if (lastEnd < new Date(endDate)) {
-        availabilities.push({
-            startDateTime: lastEnd.toISOString(),
-            endDateTime: new Date(endDate).toISOString(),
-            isAvailable: true,
-        });
-    }
-
-
-    if (unavailabilites.length === 0) {
-        availabilities.push({
-            startDateTime: `${startDate}T00:00:00`,
-            endDateTime: `${endDate}T23:59:59`,
-            isAvailable: true,
-        });
-    }
-
-    results = results.concat(availabilities);
-    results = results.sort((a, b) => {
-        return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime();
-    });
-
-    return c.json(results, HttpStatusCodes.OK);
+    return c.json(availabilities, HttpStatusCodes.OK);
 };

@@ -1,6 +1,6 @@
-import dayjs from "dayjs"
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter.js"
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter.js";
 import { sql } from "drizzle-orm";
 
 import type { AppRouteHandler } from "@/types";
@@ -91,7 +91,7 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
                             lte(
                                 sql`datetime(${u.endDate} || ' ' || ${u.endTime})`,
                                 sql`datetime(${endDate})`,
-                            )
+                            ),
                         ),
                     ),
                 ),

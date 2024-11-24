@@ -124,6 +124,7 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
 
     // extrapolate the availabilities from the unavailabilities
     const availabilities = [];
+    const date_format = "YYYY-MM-DD HH:mm:ss";
     if (unavailabilites.length === 0) {
         availabilities.push({
             startDateTime: startDate,
@@ -132,7 +133,6 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
         });
     }
     else {
-        const date_format = "YYYY-MM-DD HH:mm:ss";
         let startDatejs = dayjs(startDate, date_format);
         const endDatejs = dayjs(endDate, date_format);
 
@@ -165,5 +165,11 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
         }
     }
 
-    return c.json(availabilities, HttpStatusCodes.OK);
+    let unAvAvs = availabilities.concat(unavailabilites);
+
+    unAvAvs = unAvAvs.sort((a, b) => {
+        return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime();
+    });
+
+    return c.json(unAvAvs, HttpStatusCodes.OK);
 };

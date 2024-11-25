@@ -18,6 +18,7 @@ node_modules/
 # env
 .env
 .env.production
+.env.prod
 
 # logs
 logs/
@@ -33,3 +34,7 @@ lerna-debug.log*
 
 # drizzle
 drizzle/
+
+# sst
+.sst
+deployment.txt

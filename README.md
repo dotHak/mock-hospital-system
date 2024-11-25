@@ -30,7 +30,7 @@ Starting the might fail if the environment variables are not set. Create a `.env
 NODE_ENV=development
 LOG_LEVEL=debug
 PORT=3000
-
+HOST_NAME=0.0.0.0
 DATABASE_URL=file:./database/hospital.db
 ```
 
@@ -67,3 +67,34 @@ The project uses an SQLite database to store the data. The database file is loca
     ```
 
 NOTE: Check `package.json` for more database related commands.
+
+### Deployment to AWS
+#### Prerequisites
+- AWS Account
+- AWS CLI
+- AWS IAM User with AdministratorAccess
+- Docker
+
+
+#### Steps
+- Create a new IAM user with AdministratorAccess and download the credentials.
+- Configure the AWS CLI with the credentials.
+- Create a new environment variable files for the production environment. Create a `.env.production` file in the root directory of the project and add the following environment variables:
+    ```
+    NODE_ENV=production
+    LOG_LEVEL=info
+    PORT=3000
+    HOST_NAME=0.0.0.0
+    DATABASE_URL=file:./database/hospital.db
+    DATABASE_AUTH_TOKEN=some_secure_token
+    ```
+- Run the following command to deploy the application to AWS:
+    ```
+    npx sst deploy --stage production
+    ```
+
+    OR
+
+    ```
+    pnpm dlx sst deploy --stage production
+    ```

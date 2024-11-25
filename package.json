@@ -2,17 +2,17 @@
   "name": "mock-hospital-system",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "node ./dist/src/index.js",
+    "build": "rimraf ./dist && tsc && tsc-alias",
+    "build:tsup": "rimraf ./dist && tsup src/index.ts --format esm",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx db-seed.ts",
+    "db:studio": "drizzle-kit studio",
+    "dev": "tsx watch src/index.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "rimraf ./dist && tsc && tsc-alias",
-    "build:tsup": "tsup src/index.ts --format esm"
+    "start": "node ./dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.2",
@@ -28,10 +28,12 @@
     "hono-pino": "^0.4.0",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
+    "sst": "3.3.27",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
+    "@types/aws-lambda": "8.10.145",
     "@types/node": "^20.11.17",
     "drizzle-kit": "^0.26.2",
     "eslint": "^9.12.0",

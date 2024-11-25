@@ -1,11 +1,12 @@
 import { serve } from "@hono/node-server";
 
 import app from "@/app";
+import env from "@/env";
 
-const port = 3000;
-console.log(`Server is running on url: http://localhost:${port}`);
+console.log(`Server is running on url: http://localhost:${env.PORT}`);
 
 serve({
     fetch: app.fetch,
-    port,
+    port: env.PORT,
+    hostname: env.HOST_NAME,
 });

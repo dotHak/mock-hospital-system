@@ -13,11 +13,15 @@ export default $config({
 
         cluster.addService("MockHospitalSystem", {
             loadBalancer: {
-                ports: [{ listen: "80/http", forward: "3000/http" }],
+                domain: "mock.yourdoc.click",
+                ports: [
+                    { listen: "80/http", redirect: "8000/http" },
+                    { listen: "443/https", forward: "8000/http" }
+                ],
             },
             dev: {
-                command: "pn run dev",
+                command: "pnpm run dev",
             },
         });
-    }
+    },
 });

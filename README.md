@@ -88,6 +88,7 @@ NOTE: Check `package.json` for more database related commands.
     DATABASE_URL=file:./database/hospital.db
     DATABASE_AUTH_TOKEN=some_secure_token
     ```
+- check the `sst.config.ts` file for the configuration of the stack. Update where necessary.
 - Run the following command to deploy the application to AWS:
     ```
     npx sst deploy --stage production

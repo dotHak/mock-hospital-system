@@ -28,6 +28,6 @@ COPY --from=builder --chown=hono:nodejs /app/database /app/database
 
 
 USER hono
-EXPOSE 3000
+EXPOSE 8000
 
 CMD ["node", "/app/dist/index.js"]

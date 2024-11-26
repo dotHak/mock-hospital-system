@@ -17,8 +17,20 @@ export const list: AppRouteHandler<ListRouteType> = async (c) => {
     const { id } = c.req.valid("param");
     let { startDate, endDate } = c.req.valid("query");
 
-    startDate = `${startDate} 00:00:00`;
-    endDate = `${endDate} 23:59:59`;
+    // Monday to Friday: 7:00 AM – 5:00 PM
+    // Saturday and Sunday: 8:00 AM – 5:00 PM
+
+    const startDay = dayjs(startDate).day();
+
+    if (startDay >= 1 && startDay <= 5) {
+        startDate = `${startDate} 07:00:00`;
+    }
+    else {
+        startDate = `${startDate} 08:00:00`;
+    }
+
+    endDate = `${endDate} 17:00:00`;
+
 
     const result = await db.query.doctors.findFirst({
         where: (d, { eq }) => eq(d.id, id),

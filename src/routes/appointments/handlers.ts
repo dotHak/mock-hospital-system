@@ -1,5 +1,8 @@
 import { and, eq, gt, gte, lt, lte, not, or, sql } from "drizzle-orm";
 
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter.js";
 import type { AppRouteHandler } from "@/types";
 
 import { db } from "@/db/db";
@@ -15,6 +18,9 @@ import type {
 } from "./routes";
 
 import { filterUndedinedfields } from "../helpers";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(isSameOrAfter);
 
 export const list: AppRouteHandler<ListRouteType> = async (c) => {
   const result = await db.query.appointments.findMany();
@@ -47,6 +53,48 @@ export const getOne: AppRouteHandler<GetOneRouteType> = async (c) => {
 export const create: AppRouteHandler<CreateRouteType> = async (c) => {
   const values = c.req.valid("json");
 
+  // date validation
+  // Monday to Friday: 7:00 AM – 5:00 PM
+  // Saturday and Sunday: 8:00 AM – 5:00 PM
+  const date_format = "YYYY-MM-DD HH:mm:ss";
+  const startDate = dayjs(`${values.appointmentDate} ${values.startTime}`, date_format);
+  const endDate = dayjs(`${values.appointmentDate} ${values.endTime}`, date_format);
+
+  if (startDate.day() >= 1 && startDate.day() <= 5) {
+    if (startDate.isBefore(dayjs(`${values.appointmentDate} 07:00:00`, date_format))) {
+      return c.json(
+        {
+          message: "Appointments can only be scheduled between 7:00 AM and 5:00 PM from Monday to Friday",
+          success: false,
+          code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
+        },
+        HttpStatusCodes.UNPROCESSABLE_ENTITY,
+      );
+    }
+  } else {
+      if (startDate.isBefore(dayjs(`${values.appointmentDate} 08:00:00`, date_format))) {
+          return c.json(
+              {
+                  message: "Appointments can only be scheduled between 8:00 AM and 5:00 PM on Saturday and Sunday",
+                  success: false,
+                  code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
+              },
+             HttpStatusCodes.UNPROCESSABLE_ENTITY,
+          )
+      }
+  }
+
+  if (endDate.isAfter(dayjs(`${values.appointmentDate} 17:00:00`, date_format))) {
+    return c.json(
+      {
+        message: "Appointments can only be scheduled between 7:00 AM and 5:00 PM",
+        success: false,
+        code: HttpStatusCodes.UNPROCESSABLE_ENTITY,
+      },
+      HttpStatusCodes.UNPROCESSABLE_ENTITY,
+    );
+  }
+
   // check if the doctor id exists
   const doctor = await db.query.doctors.findFirst({
     where: (d, { eq }) => eq(d.id, values.doctorId),
@@ -67,15 +115,8 @@ export const create: AppRouteHandler<CreateRouteType> = async (c) => {
   }
 
   // check if the date is not in the past
-  const [startHour, startMinute] = values.startTime.split(":").map(Number);
-  const [endHour, endMinute] = values.endTime.split(":").map(Number);
-  const startDate = new Date(values.appointmentDate).setHours(
-    startHour,
-    startMinute,
-  );
-  const endDate = new Date(values.appointmentDate).setHours(endHour, endMinute);
 
-  if (startDate < Date.now()) {
+  if (startDate.isBefore(dayjs())) {
     return c.json(
       {
         message: "Appointment date cannot be in the past",
@@ -86,7 +127,7 @@ export const create: AppRouteHandler<CreateRouteType> = async (c) => {
     );
   }
 
-  if (endDate <= startDate) {
+  if (endDate.isBefore(startDate)) {
     return c.json(
       {
         message: "End time must be greater than start time",

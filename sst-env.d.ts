@@ -6,14 +6,5 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
-    "MockHospitalSystem": {
-      "service": string
-      "type": "sst.aws.Service"
-      "url": string
-    }
-    "MyVpc": {
-      "bastion": string
-      "type": "sst.aws.Vpc"
-    }
   }
 }

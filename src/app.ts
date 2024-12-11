@@ -47,6 +47,7 @@ app.get(
         spec: {
             url: "/api/doc",
         },
+        cdn: "https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.25.80"
     }),
 );
 
